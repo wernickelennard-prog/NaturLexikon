@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Natur-Lexikon | Digital Companion</title>
+    <title>Natur-Lexikon | Retro Companion</title>
     <style>
         :root {
             --bg-dark: #000;
@@ -21,62 +21,77 @@
             position: fixed;
             inset: 0;
             z-index: 1;
-            transition: filter 0.5s ease;
+            transition: filter 0.5s ease, transform 0.5s ease;
         }
 
         #active-banner {
             width: 100%; height: 100%;
             object-fit: cover;
-            /* Falls das Bild noch nicht lädt, siehst du Schwarz */
-            background: #111; 
+            background: #111; /* Fallback Farbe */
         }
 
-        /* Der Blur-Effekt wenn der Vogel spricht */
+        /* Der Blur-Effekt (Verschwimmen) wie gewünscht */
         .blur-active {
-            filter: blur(8px) brightness(0.7);
+            filter: blur(10px) brightness(0.6) grayscale(0.3);
         }
 
         /* ÜBERSCHRIFT */
         .title-overlay {
             position: absolute;
-            top: 10%; left: 5%;
+            top: 8%; left: 5%;
             z-index: 5;
             pointer-events: none;
         }
 
         .title-overlay h1 {
-            font-size: 100px; margin: 0;
-            letter-spacing: 20px; font-weight: 900;
+            font-size: clamp(50px, 10vw, 120px);
+            margin: 0;
+            letter-spacing: 15px;
+            font-weight: 900;
             text-transform: uppercase;
+            color: white;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         /* NAVIGATION (DEINE ICONS) */
         .nav-bar {
             position: absolute;
             top: 40px; right: 5%;
-            display: flex; gap: 20px;
+            display: flex; gap: 25px;
             z-index: 100;
         }
 
         .nav-item {
             cursor: pointer; text-align: center;
-            opacity: 0.7; transition: 0.3s;
+            transition: 0.3s;
         }
 
-        .nav-item:hover { opacity: 1; transform: scale(1.1); }
-
         .icon-box {
-            width: 70px; height: 70px;
-            background: rgba(0,0,0,0.8);
-            border: 2px solid white;
+            width: 80px; height: 80px;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid rgba(255,255,255,0.8);
             display: flex; align-items: center; justify-content: center;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            backdrop-filter: blur(5px);
+        }
+
+        .icon-box img { 
+            width: 50px; height: 50px; 
+            object-fit: contain;
+        }
+
+        .nav-item span {
+            font-size: 10px;
+            letter-spacing: 2px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px black;
         }
 
         /* POKEMON DIALOG SYSTEM */
         .companion-system {
             position: fixed;
-            bottom: 40px; left: 5%; right: 5%;
+            bottom: 50px; left: 5%; right: 5%;
             display: flex;
             align-items: flex-end;
             justify-content: flex-end;
@@ -84,45 +99,59 @@
         }
 
         .speech-box {
-            background: white;
-            color: black;
+            background: rgba(255, 255, 255, 0.95);
+            color: #111;
             border: 4px solid #333;
-            padding: 25px;
-            width: 70%; /* Lange Box wie bei Pokémon */
+            padding: 25px 40px 25px 25px;
+            flex-grow: 1; /* Streckt sich nach links aus */
+            max-width: 800px;
             margin-right: 20px;
-            border-radius: 10px;
+            border-radius: 15px;
             position: relative;
-            box-shadow: 0 10px 0px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
             cursor: pointer;
-            display: none; /* Startet versteckt */
+            display: none;
+            font-size: 18px;
+            line-height: 1.4;
         }
 
+        /* Das blinkende Dreieck unten rechts in der Box */
         .speech-box::after {
             content: '▼';
             position: absolute; bottom: 10px; right: 20px;
-            font-size: 12px; animation: blink 1s infinite;
+            font-size: 14px; color: #666;
+            animation: blink 0.8s infinite;
         }
 
         @keyframes blink { 50% { opacity: 0; } }
 
+        /* Der hüpfende Pixel-Vogel */
         .companion-bird {
-            width: 120px; height: 120px;
+            width: 150px; height: 150px;
             background: url('spritesheet-rotkehlch-px.png') no-repeat;
-            background-size: 360px 120px; /* 3 Frames */
+            background-size: 450px 150px; /* 3 Frames à 150px */
             image-rendering: pixelated;
-            animation: hop 0.6s steps(3) infinite;
+            animation: hop 0.7s steps(3) infinite;
             cursor: pointer;
+            flex-shrink: 0;
+            transition: transform 0.2s;
         }
+
+        .companion-bird:hover { transform: scale(1.1); }
 
         @keyframes hop {
             from { background-position: 0; }
-            to { background-position: -360px; }
+            to { background-position: -450px; }
         }
 
-        .nabu-link {
-            display: block; margin-top: 10px;
+        .nabu-btn {
+            display: inline-block; margin-top: 15px;
             color: #0066cc; font-weight: bold; text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: 0.3s;
         }
+        .nabu-btn:hover { border-bottom-color: #0066cc; }
+
     </style>
 </head>
 <body>
@@ -136,15 +165,15 @@
 
     <nav class="nav-bar">
         <div class="nav-item" onclick="changeCategory('vögel')">
-            <div class="icon-box"><img src="icon_vogel.png" width="40"></div>
+            <div class="icon-box"><img src="image_6270c5.png" alt="Icon Vögel"></div>
             <span>VÖGEL</span>
         </div>
         <div class="nav-item" onclick="changeCategory('säugetiere')">
-            <div class="icon-box"><img src="icon_saugetiere.png" width="40"></div>
+            <div class="icon-box"><img src="image_6270c5.png" alt="Icon Säuger"></div>
             <span>SÄUGETIERE</span>
         </div>
         <div class="nav-item" onclick="changeCategory('pilze')">
-            <div class="icon-box"><img src="icon_pilze.png" width="40"></div>
+            <div class="icon-box"><img src="image_6270c5.png" alt="Icon Pilze"></div>
             <span>PILZE</span>
         </div>
     </nav>
@@ -152,25 +181,43 @@
     <div class="companion-system">
         <div id="speech-box" class="speech-box" onclick="closeMessage()">
             <div id="text-content"></div>
-            <a href="https://www.nabu.de" target="_blank" class="nabu-link">JETZT NABU SPENDEN →</a>
+            <a href="https://www.nabu.de" target="_blank" class="nabu-btn">JETZT NABU UNTERSTÜTZEN →</a>
         </div>
         <div class="companion-bird" onclick="toggleMessage()"></div>
     </div>
 
     <script>
         const data = {
-            'vögel': { title: 'VÖGEL', img: 'image_6faba7.jpg', msg: 'Hallo! Ich bin dein Guide. Vögel sind erstaunlich – manche fliegen tausende Kilometer weit!' },
-            'säugetiere': { title: 'SÄUGETIERE', img: 'image_6faf03.jpg', msg: 'Säugetiere haben Fell und sind warmblütig. Das Hermelin hier ist ein flinker Jäger.' },
-            'pilze': { title: 'PILZE', img: 'image_6fb364.jpg', msg: 'Pilze sind die heimlichen Herrscher des Waldes. Sie recyceln alles organische Material.' }
+            'vögel': { 
+                title: 'VÖGEL', 
+                img: 'image_6faba7.jpg', 
+                msg: 'Piep! Vögel sind wahre Flugkünstler. Einige können sogar schlafend fliegen!' 
+            },
+            'säugetiere': { 
+                title: 'SÄUGETIERE', 
+                img: 'image_6faf03.jpg', 
+                msg: 'Säugetiere haben Fell und versorgen ihre Jungen mit Milch. Das Hermelin hier wechselt im Winter sein Kleid.' 
+            },
+            'pilze': { 
+                title: 'PILZE', 
+                img: 'image_6fb364.jpg', 
+                msg: 'Pilze sind weder Tier noch Pflanze. Sie bilden riesige Netzwerke tief unter der Erde.' 
+            }
         };
 
         function changeCategory(key) {
             const item = data[key];
-            document.getElementById('category-name').innerText = item.title;
-            document.getElementById('active-banner').src = item.img;
-            
-            // Nachricht automatisch öffnen
-            openMessage(item.msg);
+            const banner = document.getElementById('active-banner');
+            const title = document.getElementById('category-name');
+
+            // Sanfter Wechsel
+            banner.style.opacity = 0.5;
+            setTimeout(() => {
+                banner.src = item.img;
+                title.innerText = item.title;
+                banner.style.opacity = 1;
+                openMessage(item.msg);
+            }, 200);
         }
 
         function openMessage(text) {
@@ -190,15 +237,17 @@
         function toggleMessage() {
             const box = document.getElementById('speech-box');
             if (box.style.display === 'none' || box.style.display === '') {
-                const currentCat = document.getElementById('category-name').innerText.toLowerCase();
-                openMessage(data[currentCat].msg);
+                const currentTitle = document.getElementById('category-name').innerText.toLowerCase();
+                openMessage(data[currentTitle].msg);
             } else {
                 closeMessage();
             }
         }
         
-        // Starte mit der ersten Nachricht
-        window.onload = () => openMessage(data['vögel'].msg);
+        // Start-Animation
+        window.onload = () => {
+            setTimeout(() => openMessage(data['vögel'].msg), 500);
+        };
     </script>
 </body>
 </html>
