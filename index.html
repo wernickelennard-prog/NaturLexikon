@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Natur-Lexikon | Digital Companion</title>
+    <style>
+        :root {
+            --bg-dark: #000;
+            --text-white: #ffffff;
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            background: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        /* BANNER SYSTEM */
+        .main-view {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            transition: filter 0.5s ease;
+        }
+
+        #active-banner {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            /* Falls das Bild noch nicht lädt, siehst du Schwarz */
+            background: #111; 
+        }
+
+        /* Der Blur-Effekt wenn der Vogel spricht */
+        .blur-active {
+            filter: blur(8px) brightness(0.7);
+        }
+
+        /* ÜBERSCHRIFT */
+        .title-overlay {
+            position: absolute;
+            top: 10%; left: 5%;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .title-overlay h1 {
+            font-size: 100px; margin: 0;
+            letter-spacing: 20px; font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        /* NAVIGATION (DEINE ICONS) */
+        .nav-bar {
+            position: absolute;
+            top: 40px; right: 5%;
+            display: flex; gap: 20px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            cursor: pointer; text-align: center;
+            opacity: 0.7; transition: 0.3s;
+        }
+
+        .nav-item:hover { opacity: 1; transform: scale(1.1); }
+
+        .icon-box {
+            width: 70px; height: 70px;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid white;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 5px;
+        }
+
+        /* POKEMON DIALOG SYSTEM */
+        .companion-system {
+            position: fixed;
+            bottom: 40px; left: 5%; right: 5%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            z-index: 200;
+        }
+
+        .speech-box {
+            background: white;
+            color: black;
+            border: 4px solid #333;
+            padding: 25px;
+            width: 70%; /* Lange Box wie bei Pokémon */
+            margin-right: 20px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 10px 0px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: none; /* Startet versteckt */
+        }
+
+        .speech-box::after {
+            content: '▼';
+            position: absolute; bottom: 10px; right: 20px;
+            font-size: 12px; animation: blink 1s infinite;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .companion-bird {
+            width: 120px; height: 120px;
+            background: url('spritesheet-rotkehlch-px.png') no-repeat;
+            background-size: 360px 120px; /* 3 Frames */
+            image-rendering: pixelated;
+            animation: hop 0.6s steps(3) infinite;
+            cursor: pointer;
+        }
+
+        @keyframes hop {
+            from { background-position: 0; }
+            to { background-position: -360px; }
+        }
+
+        .nabu-link {
+            display: block; margin-top: 10px;
+            color: #0066cc; font-weight: bold; text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-view" class="main-view">
+        <img id="active-banner" src="image_6faba7.jpg" alt="Banner">
+        <div class="title-overlay">
+            <h1 id="category-name">VÖGEL</h1>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <div class="nav-item" onclick="changeCategory('vögel')">
+            <div class="icon-box"><img src="icon_vogel.png" width="40"></div>
+            <span>VÖGEL</span>
+        </div>
+        <div class="nav-item" onclick="changeCategory('säugetiere')">
+            <div class="icon-box"><img src="icon_saugetiere.png" width="40"></div>
+            <span>SÄUGETIERE</span>
+        </div>
+        <div class="nav-item" onclick="changeCategory('pilze')">
+            <div class="icon-box"><img src="icon_pilze.png" width="40"></div>
+            <span>PILZE</span>
+        </div>
+    </nav>
+
+    <div class="companion-system">
+        <div id="speech-box" class="speech-box" onclick="closeMessage()">
+            <div id="text-content"></div>
+            <a href="https://www.nabu.de" target="_blank" class="nabu-link">JETZT NABU SPENDEN →</a>
+        </div>
+        <div class="companion-bird" onclick="toggleMessage()"></div>
+    </div>
+
+    <script>
+        const data = {
+            'vögel': { title: 'VÖGEL', img: 'image_6faba7.jpg', msg: 'Hallo! Ich bin dein Guide. Vögel sind erstaunlich – manche fliegen tausende Kilometer weit!' },
+            'säugetiere': { title: 'SÄUGETIERE', img: 'image_6faf03.jpg', msg: 'Säugetiere haben Fell und sind warmblütig. Das Hermelin hier ist ein flinker Jäger.' },
+            'pilze': { title: 'PILZE', img: 'image_6fb364.jpg', msg: 'Pilze sind die heimlichen Herrscher des Waldes. Sie recyceln alles organische Material.' }
+        };
+
+        function changeCategory(key) {
+            const item = data[key];
+            document.getElementById('category-name').innerText = item.title;
+            document.getElementById('active-banner').src = item.img;
+            
+            // Nachricht automatisch öffnen
+            openMessage(item.msg);
+        }
+
+        function openMessage(text) {
+            const box = document.getElementById('speech-box');
+            const view = document.getElementById('main-view');
+            document.getElementById('text-content').innerText = text;
+            
+            box.style.display = 'block';
+            view.classList.add('blur-active');
+        }
+
+        function closeMessage() {
+            document.getElementById('speech-box').style.display = 'none';
+            document.getElementById('main-view').classList.remove('blur-active');
+        }
+
+        function toggleMessage() {
+            const box = document.getElementById('speech-box');
+            if (box.style.display === 'none' || box.style.display === '') {
+                const currentCat = document.getElementById('category-name').innerText.toLowerCase();
+                openMessage(data[currentCat].msg);
+            } else {
+                closeMessage();
+            }
+        }
+        
+        // Starte mit der ersten Nachricht
+        window.onload = () => openMessage(data['vögel'].msg);
+    </script>
+</body>
+</html>
